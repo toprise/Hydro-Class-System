@@ -1,0 +1,218 @@
+{% extends "layout/basic.html" %}
+{% block content %}
+<div class="row">
+  <div class="medium-9 columns">
+    <div class="section">
+      <form method="post">
+        <div class="section__header">
+          <h2 class="section__title">{{ _('Basic Info') }}</h2>
+        </div>
+        <div class="section__body">
+          <div class="row">
+            {{ form.form_select({
+              columns:3,
+              label:'Rule',
+              name:'rule',
+              options:rules,
+              value:tdoc['rule']|default(''),
+              row:false
+            }) }}
+            {{ form.form_text({
+              columns:9,
+              label:'Title',
+              name:'title',
+              placeholder:_('title'),
+              value:tdoc.title|default(''),
+              autofocus:true,
+              row:false
+            }) }}
+          </div>
+          <div class="row">
+            {{ form.form_text({
+              columns:3,
+              label:'Begin Date',
+              name:'beginAtDate',
+              placeholder:'YYYY-mm-dd',
+              value:beginAt.format('YYYY-M-D'),
+              date:true,
+              row:false
+            }) }}
+            {{ form.form_text({
+              columns:3,
+              label:'Begin Time',
+              name:'beginAtTime',
+              placeholder:'HH:MM',
+              value:beginAt.format('H:mm'),
+              time:true,
+              row:false
+            }) }}
+            {{ form.form_text({
+              columns:2,
+              label:'Duration (hours)',
+              name:'duration',
+              value:duration|default('3'),
+              row:false
+            }) }}
+            {{ form.form_text({
+              columns:4,
+              label:'End Time',
+              name:'endAt',
+              placeholder:'YYYY-mm-dd HH:MM',
+              value:beginAt.add(duration, 'hours').format('YYYY-M-D HH:mm'),
+              disabled:true,
+              row:false
+            }) }}
+          </div>
+          {{ form.form_text({
+            columns:12,
+            label:'Problems',
+            name:'pids',
+            value:pids,
+            placeholder:_("Seperated with ','"),
+            row:true
+          }) }}
+          {{ form.form_textarea({
+            columns:null,
+            label:'Description',
+            name:'content',
+            value:tdoc['content']|default(''),
+            markdown:true
+          }) }}
+        </div>
+        <div style="padding-top: 0" class="section__header">
+          <h2 class="section__title">{{ _('Permission Control') }}</h2>
+        </div>
+        <div class="section__body">
+          {{ form.form_text({
+            columns:12,
+            label:'Contest Maintainer',
+            name:'maintainer',
+            help_text:_('Allow to maintain this {0}').format(_('contest')),
+            value:tdoc.maintainer|default('')
+          }) }}
+          <div class="row">
+            {{ form.form_select({
+              columns:3,
+              label:'Permission Control',
+              name:'permission',
+              options:{
+                'public': _('Public'),
+                'invite': _('Require Invitation Code'),
+                'assign': _('Assign User or Group')
+              },
+              value: ("public" if not tdoc._code else "invite") if not tdoc.assign|length else "assign",
+              disabled:true,
+              row:false
+            }) }}
+            <div style="display: none" data-perm="assign">
+            {{ form.form_text({
+              columns:9,
+              label:'Assign',
+              name:'assign',
+              placeholder:_('Group / UID'),
+              value:tdoc.assign|default(''),
+              disabled:true,
+              row:false
+            }) }}
+            </div>
+            <div style="display: none" data-perm="invite">
+            {{ form.form_text({
+              columns:9,
+              label:'Invitation Code',
+              name:'code',
+              placeholder:_('(leave blank if none)'),
+              value:tdoc._code|default(''),
+              disabled:true,
+              row:false
+            }) }}
+            </div>
+          </div>
+        </div>
+        <div style="padding-top: 0" class="section__header">
+          <h2 class="section__title">{{ _('Contest Settings') }}</h2>
+        </div>
+        <div class="section__body">
+          <div class="row">
+            {{ form.form_checkbox({
+              columns:2,
+              label:'Rated',
+              name:'rated',
+              placeholder:_('Is rated'),
+              value:tdoc.rated|default(true),
+              row:false
+            }) }}
+            {{ form.form_checkbox({
+              columns:3,
+              label:'Auto hide-and show',
+              name:'autoHide',
+              placeholder:_('Auto hide problems during the contest'),
+              value:handler.user.hasPerm(perm.PERM_EDIT_PROBLEM) and (tdoc.autoHide|default(true)),
+              disabled:not handler.user.hasPerm(perm.PERM_EDIT_PROBLEM),
+              row:false
+            }) }}
+            {{ form.form_checkbox({
+              columns:3,
+              label:'Allow View Code',
+              name:'allowViewCode',
+              placeholder:_('Allow user view others code after contest'),
+              value:tdoc.allowViewCode|default(true),
+              row:false
+            }) }}
+            <div style="display: none" class="contest-rule-settings contest-rule--acm contest-rule--ioi contest-rule--strictioi">
+            {{ form.form_text({
+              columns:4,
+              label:'Lock (minutes)',
+              name:'lock',
+              placeholder:_('(leave blank if none)'),
+              value:(((tdoc.endAt - tdoc.lockAt)/60000)|int) if tdoc.lockAt else '',
+              help_text:_('Freeze scoreboard with N minutes remaining'),
+              disabled:true,
+              row:false
+            }) }}
+            </div>
+            <div style="display: none" class="contest-rule-settings contest-rule--oi">
+            {{ form.form_text({
+              columns:4,
+              label:'Flexable Duration',
+              name:'contestDuration',
+              placeholder:_('(leave blank if none)'),
+              value:tdoc.duration|default(''),
+              help_text:_('Limit user to finish contest within N hours'),
+              disabled:true,
+              row:false
+            }) }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="columns">
+              {% if page_name == 'contest_edit' %}
+                <button name="operation" value="update" type="submit" class="rounded primary button">
+                  {{ _('Update') }}
+                </button>
+                <button name="operation" value="update" type="submit" formaction="{{ url('contest_create') }}" class="rounded button">
+                  {{ _('Clone') }}
+                </button>
+                {% if handler.user.own(tdoc) or handler.user.hasPerm(perm.PERM_EDIT_CONTEST) %}
+                  <button name="operation" value="delete" type="submit" class="rounded button">
+                    {{ _('Delete') }}
+                  </button>
+                {% endif %}
+              {% else %}
+                <button name="operation" value="update" type="submit" class="rounded primary button">
+                  {{ _('Create') }}
+                </button>
+              {% endif %}
+              <button type="button" class="rounded button" onclick="window.history.go(-1)">
+                {{ _('Cancel') }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="medium-3 columns">
+    {% include 'components/md_hint.html' %}
+  </div>
+</div>
+{% endblock %}

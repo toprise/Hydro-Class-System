@@ -1,0 +1,62 @@
+# Built Files & Log
+.build/
+dist/
+*.cache
+.cache
+/build/*.js
+.cache/
+*.log
+*.js.map
+*.tsbuildinfo
+*.hydro
+.coverage
+coverage
+.nyc_output
+benchmark.json
+globalConfig.json
+*.out
+.clinic/
+.yarn/cache
+.yarn/build-state.yml
+.yarn/unplugged
+.yarn/sdks
+.yarn/install-state.gz
+.pnp.*
+
+# Config Files
+/config.yaml
+/config.json
+yarn.lock
+pnpm-lock.yaml
+tsconfig.json
+tsconfig.*.json
+
+# Project Rules
+## Core
+packages/**/*.js
+!/build/*.js
+!**/bin/*.js
+!*.page.js
+!packages/utils/lib/register.js
+## ui-default
+!packages/ui-default/**/*.js
+!packages/geoip/download.js
+!examples/**
+packages/ui-default/public
+packages/ui-default/misc/.iconfont
+packages/ui-default/static/locale
+plugins/
+modules/
+
+# Data files
+*.mmdb
+
+# Base
+node_modules/
+__*
+!__mocks__
+!.gitkeep
+*.local
+
+# Monokle
+.monokle

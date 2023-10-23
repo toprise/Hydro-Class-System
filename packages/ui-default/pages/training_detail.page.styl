@@ -1,0 +1,48 @@
+.page--training_detail
+  .col--status
+    width: rem(150px)
+    position: relative
+
+    &.col--status--sm
+      width: rem(84px)
+
+  .col--tried, .col--ac, .col--difficulty
+    width: rem(70px)
+    text-align: center
+
+  .col--status
+    border-right: 1px solid $table-border-color
+
+  .col--tried, .col--difficulty
+    border-left: 1px solid $table-border-color
+
+  +mobile()
+    .col--status,
+    .col--tried,
+    .col--difficulty
+      display: none
+
+    .col--ac
+      border-left: 1px solid $table-border-color
+
+  .training__section
+    &.invalid
+      .training__problems
+        opacity: 0.6
+
+    &.collapsed .collapsed--hidden,
+    &.expanded .expanded--hidden
+      display: none
+
+    &.collapsed .training__section__detail
+      display: none
+
+  #menu-item-training_detail ul
+    max-height: calc(85vh - 345px)
+    overflow-y: auto
+    overflow-x: hidden
+
+  .enroll_user_menu
+    max-height: 85vh
+    overflow-y: auto
+    overflow-x: hidden

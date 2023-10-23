@@ -1,0 +1,26 @@
+{% extends "layout/basic.html" %}
+{% block content %}
+<div class="row" data-sticky-parent>
+  <div class="medium-9 columns">
+  {% block domain_content %}{% endblock %}
+  </div>
+  <div class="medium-3 columns"><div data-sticky="large">
+    <div class="section side">
+      <ol class="menu">
+        {%- for family, items in ui.getNodes('DomainManage')|groupby('args.family') -%}
+          <li class="menu__item">
+            <div class="menu__link expandable">
+              <span class="icon icon-{{ items[0].args.icon }}"></span> {{ _(family) }}
+            </div>
+            <ol class="menu collapsed">
+              {%- for item in items -%}
+                {{ sidemenu.render_item(null, item.name) }}
+              {%- endfor -%}
+            </ol>
+          </li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div></div>
+</div>
+{% endblock %}
